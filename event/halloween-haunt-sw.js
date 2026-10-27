@@ -2,13 +2,17 @@
  * BSMS Web
  * Copyright © 2026 Jellyfish Jelly
  * SPDX-License-Identifier: MIT
- *
- * Halloween Haunt-only offline cache.
  */
-const CACHE_NAME = 'bsms-halloween-haunt-v4';
+/* Halloween Haunt-only offline cache. */
+const CACHE_NAME = 'bsms-halloween-haunt-v8';
 const CORE_ASSETS = [
   '/event/halloween-haunt.html',
+  '/css/styles.css',
+  '/css/halloween-haunt.css',
   '/js/halloween-haunt.js',
+  '/js/halloween-haunt-page.js',
+  '/js/halloween-haunt-offline.js',
+  '/js/halloween-haunt-redesign.js',
   '/js/ban-check.js',
   '/js/account-check.js',
   '/img/icon.png',
@@ -72,7 +76,11 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (request.mode === 'navigate' && url.pathname === '/event/halloween-haunt.html') {
+  // Never serve or cache API responses from this static-asset worker.
+  if (url.pathname === '/api' || url.pathname.startsWith('/api/')) return;
+
+  if (request.mode === 'navigate' &&
+      (url.pathname === '/event/halloween-haunt.html' || url.pathname === '/event/halloween-haunt')) {
     event.respondWith((async () => {
       try {
         const response = await fetch(request);
